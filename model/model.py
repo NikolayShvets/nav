@@ -10,7 +10,7 @@ class Model:
         self.t_start = t_start
         self.t_finish = t_finish
         self.t_step = t_step
-        self.state = state
+        self.init_state = state
         self.results = []
 
     def increment(self, *args, **kwargs) -> np.array:

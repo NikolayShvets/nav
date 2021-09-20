@@ -44,15 +44,17 @@ class Quadcopter(Model):
                  t_step: float = 1.0):
         super().__init__(state,
                          t_start, t_finish, t_step)
-        self.ars = AngularRateSensor(state[:3],
-                                     t_start, t_finish, t_step)
-        self.state = np.concatenate((state, self.ars.state))
+        self.ars = AngularRateSensor(state[:3], t_start, t_finish, t_step)
+        self.init_state = np.concatenate((state, self.ars.init_state))
 
     def increment(self, t, x: np.array) -> np.array:
         y = np.zeros(x.shape)
         y[0] = x[3]
         y[1] = x[4]
         y[2] = x[5]
+        y[3] = 0.0
+        y[4] = 0.0
+        y[5] = 0.0
 
         # y[3] = (1 / self.jx *
         #         (self.r * 0.01 + (self.jr + self.jp) *
@@ -66,11 +68,11 @@ class Quadcopter(Model):
         #          x[3] * (-self.W1 + self.W2 - self.W3 + self.W4) +
         #          x[3] * x[5] * (self.jx - self.jz)))
 
-        y[3] = np.sin(t)
-        y[4] = np.sin(t)
-        y[5] = np.sin(t)
+        # y[3] = 0.0 # np.sin(t)
+        # y[4] = 0.0 # np.sin(t)
+        # y[5] = 0.0 # np.sin(t)
 
-        ars_y = self.ars.increment(t, x[6:], w=x[:3])
+        ars_y = self.ars.increment(t, x[6:], w=x[3:6])
         y[6:] = ars_y
         return y
 

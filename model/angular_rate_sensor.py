@@ -23,25 +23,27 @@ class AngularRateSensor(Model):
     def increment(self, t, l: np.array, w) -> np.array:
         dl = np.zeros(l.shape)
         wr, wy, wp = w
-        dl[0] = -1 / 2 * (wr * l[1] + wy * l[2] + wp * l[3])
-        dl[1] = +1 / 2 * (wr * l[0] + wy * l[3] - wp * l[2])
-        dl[2] = +1 / 2 * (wy * l[0] + wp * l[1] - wr * l[3])
-        dl[3] = +1 / 2 * (wp * l[0] + wr * l[2] - wy * l[1])
+        dl[0] = -0.5 * (wr * l[1] + wy * l[2] + wp * l[3])
+        dl[1] = +0.5 * (wr * l[0] + wy * l[3] - wp * l[2])
+        dl[2] = +0.5 * (wy * l[0] + wp * l[1] - wr * l[3])
+        dl[3] = +0.5 * (wp * l[0] + wr * l[2] - wy * l[1])
 
         return dl
 
-    def roll_yaw_pitch(self):
-        l = self.state
+    @classmethod
+    def roll_yaw_pitch(cls, l):
         l_norm = l / sum([li ** 2 for li in l])
-        r = np.arcsin(
-            (2 * l_norm[0] * l_norm[1] - 2 * l_norm[2] * l_norm[3]) /
+        r = np.arctan2(
+            (2 * l_norm[0] * l_norm[1] - 2 * l_norm[2] * l_norm[3]),
             (2 * l_norm[0] ** 2 + 2 * l_norm[2] ** 2 - 1)
         )
-        y = np.arcsin(
-            (2 * l_norm[0] * l_norm[2] - 2 * l_norm[1] * l_norm[3]) /
+        y = np.arctan2(
+            (2 * l_norm[0] * l_norm[2] - 2 * l_norm[1] * l_norm[3]),
             (2 * l_norm[0] ** 2 + 2 * l_norm[1] ** 2 - 1)
         )
         p = np.arcsin(
             (2 * l_norm[1] * l_norm[2] + 2 * l_norm[0] * l_norm[3])
         )
+        # if r < 0.0:
+        #     r += -2 * np.pi
         return r, y, p
