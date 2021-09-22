@@ -8,6 +8,6 @@ class WhiteNoise:
         self.__std = std
         self.__size = size
 
-    def __call__(self):
+    def __call__(self, std: float):
         return np.random.normal(self.__mean, self.__std, self.__size)
 

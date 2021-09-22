@@ -20,6 +20,8 @@ class AngularRateSensor(Model):
         super().__init__(np.array(l),
                          t_start, t_finish, t_step)
 
+        self.measurements = []
+
     def increment(self, t, l: np.array, w) -> np.array:
         dl = np.zeros(l.shape)
         wr, wy, wp = w
@@ -44,6 +46,6 @@ class AngularRateSensor(Model):
         p = np.arcsin(
             (2 * l_norm[1] * l_norm[2] + 2 * l_norm[0] * l_norm[3])
         )
-        # if r < 0.0:
-        #     r += -2 * np.pi
+        r = (r + np.pi * 2) % (np.pi * 2)
+        y = (y + np.pi * 2) % (np.pi * 2)
         return r, y, p
