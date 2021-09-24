@@ -9,13 +9,13 @@ def rotate_matrix_b_g(r, y, p):
     m = np.array([
         [c(y) * c(p), -c(r) * c(y) * s(p) + s(r) * s(y), s(r) * c(y) * s(p) + c(r) * s(y)],
         [s(p), c(r) * c(p), -s(r) * c(p)],
-        [-c(y) * s(p), c(r) * s(y) * s(p) + s(r) * c(y), -s(r) * s(y) * s(p) + c(r) * c(y)]
+        [-c(p) * s(y), c(r) * s(y) * s(p) + s(r) * c(y), -s(r) * s(y) * s(p) + c(r) * c(y)]
     ])
-    return m
+    return m.transpose()# np.linalg.inv(m)
 
 
 #              r    y    p    wr   wy   wp
-x = np.array([0.0, 0.0, 0.0, 0.01, 0.0, 0.01], dtype=float)
+x = np.array([0.0, np.pi/3, 0.0, 1.0, 0.0, 0.0], dtype=float)
 
 quadcopter = Quadcopter(state=x, t_start=0.0, t_step=0.01, t_finish=10)
 rk = RK45(fun=quadcopter.increment,
@@ -41,7 +41,8 @@ while rk.t < rk.t_bound:
     eps = np.random.normal(0.0, 1e-2, 3)
     eps.shape = 3, 1
 
-    measurement = wb #+ ub + eps
+    measurement = wb + ub + eps
     quadcopter.ars.measurements.append(measurement)
 
-    print(wb[1], wg[1], sep="\n")
+    print(measurement)
+

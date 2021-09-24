@@ -60,7 +60,7 @@ class Quadcopter(Model):
                  x[5] * (self.W1 - self.W2 + self.W3 - self.W4) +
                  x[4] * x[5] * (self.jz - self.jy)))
 
-        y[4] = 1 / self.jy * (self.r * 0.01 + x[4] * x[3] * (self.jy - self.jx))
+        y[4] = 1 / self.jy * (self.r * 0.0 + x[4] * x[3] * (self.jy - self.jx))
 
         y[5] = (1 / self.jz *
                 (self.r * 0.0 + (self.jr + self.jp) *
