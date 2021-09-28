@@ -1,20 +1,14 @@
-# import numpy as np
-# from pyquaternion import Quaternion
-#
-#
-# def get_q(x: np.array) -> Quaternion:
-#     h_r = x[0] / 2
-#     h_y = x[1] / 2
-#     h_p = x[2] / 2
-#     l0 = (np.cos(h_r) * np.cos(h_y) * np.cos(h_p) -
-#           np.sin(h_r) * np.sin(h_y) * np.sin(h_p))
-#     l1 = (np.sin(h_r) * np.cos(h_y) * np.cos(h_p) +
-#           np.cos(h_r) * np.sin(h_y) * np.sin(h_p))
-#     l2 = (np.cos(h_r) * np.sin(h_y) * np.cos(h_p) +
-#           np.sin(h_r) * np.cos(h_y) * np.sin(h_p))
-#     l3 = (np.cos(h_r) * np.cos(h_y) * np.sin(h_p) -
-#           np.sin(h_r) * np.sin(h_y) * np.cos(h_p))
-#
-#     q = Quaternion([l0, l1, l2, l3])
-#
-#     return q
+import numpy as np
+
+
+def rotate_matrix_b2g(r, y, p, inv: bool = False):
+    c = np.cos
+    s = np.sin
+    m = np.array([
+        [c(y) * c(p), -c(r) * c(y) * s(p) + s(r) * s(y), s(r) * c(y) * s(p) + c(r) * s(y)],
+        [s(p), c(r) * c(p), -s(r) * c(p)],
+        [-c(p) * s(y), c(r) * s(y) * s(p) + s(r) * c(y), -s(r) * s(y) * s(p) + c(r) * c(y)]
+    ])
+    if inv:
+        return np.linalg.inv(m)
+    return m

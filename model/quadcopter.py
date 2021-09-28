@@ -1,5 +1,6 @@
 from .model import Model
 from .angular_rate_sensor import AngularRateSensor
+from utils import rotate_matrix_b2g
 import numpy as np
 
 
