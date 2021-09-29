@@ -1,6 +1,4 @@
 from .model import Model
-from .angular_rate_sensor import AngularRateSensor
-from utils import rotate_matrix_b2g
 import numpy as np
 
 
@@ -13,8 +11,6 @@ class Quadcopter(Model):
     h = 150.0
     # радиус Земли
     R = 6371e3
-    # угловая скорость вращения Земли
-    U = 7.292115e-5
     # ускорение свободного падения
     g = 9.8
     # масса двигаетля
@@ -41,41 +37,42 @@ class Quadcopter(Model):
     # скорости пропеллеров при зависании
     W1 = W2 = W3 = W4 = 340
 
-    def __init__(self, state: np.array,
-                 t_start: float = 0.0,
-                 t_finish: float = 50.0,
-                 t_step: float = 1.0):
-        super().__init__(state,
-                         t_start, t_finish, t_step)
-        self.ars = AngularRateSensor(state[:3], t_start, t_finish, t_step)
-        self.init_state = np.concatenate((state, self.ars.init_state))
+    def __init__(self, state: np.array):
+        super().__init__(state)
 
-    def increment(self, t, x: np.array) -> np.array:
+        r, y, p = state[:3]
+        l0 = (np.cos(r / 2) * np.cos(y / 2) * np.cos(p / 2) -
+              np.sin(r / 2) * np.sin(y / 2) * np.sin(p / 2))
+        l1 = (np.sin(r / 2) * np.cos(y / 2) * np.cos(p / 2) +
+              np.cos(r / 2) * np.sin(y / 2) * np.sin(p / 2))
+        l2 = (np.cos(r / 2) * np.sin(y / 2) * np.cos(p / 2) +
+              np.sin(r / 2) * np.cos(y / 2) * np.sin(p / 2))
+        l3 = (np.cos(r / 2) * np.cos(y / 2) * np.sin(p / 2) -
+              np.sin(r / 2) * np.sin(y / 2) * np.cos(p / 2))
+        l = np.array([l0, l1, l2, l3])
+        self.init_state = np.concatenate((l, state[3:6]))
+
+    def increment(self, t: float, x: np.array) -> np.array:
         y = np.zeros(x.shape)
-        y[0] = x[3]
-        y[1] = x[4]
-        y[2] = x[5]
+        wr, wy, wp = x[4:7]
+        l = x[:4]
+        y[0] = -0.5 * (wr * l[1] + wy * l[2] + wp * l[3])
+        y[1] = +0.5 * (wr * l[0] + wy * l[3] - wp * l[2])
+        y[2] = +0.5 * (wy * l[0] + wp * l[1] - wr * l[3])
+        y[3] = +0.5 * (wp * l[0] + wr * l[2] - wy * l[1])
 
-        y[3] = (1 / self.jx *
-                (self.r * 0.0 + (self.jr + self.jp) *
-                 x[5] * (self.W1 - self.W2 + self.W3 - self.W4) +
-                 x[4] * x[5] * (self.jz - self.jy)))
-
-        y[4] = 1 / self.jy * (self.r * 0.0 + x[4] * x[3] * (self.jy - self.jx))
-
-        y[5] = (1 / self.jz *
-                (self.r * 0.0 + (self.jr + self.jp) *
-                 x[3] * (-self.W1 + self.W2 - self.W3 + self.W4) +
-                 x[3] * x[5] * (self.jx - self.jz)))
-
-        ars_y = self.ars.increment(t, x[6:], w=x[3:6])
-        y[6:] = ars_y
+        y[4] = 1.0
+        y[5] = 0.0
+        y[6] = 0.0
+        # y[4] = (1 / self.jx *
+        #         (self.r * 0.0 + (self.jr + self.jp) *
+        #          x[5] * (self.W1 - self.W2 + self.W3 - self.W4) +
+        #          x[4] * x[5] * (self.jz - self.jy)))
+        #
+        # y[5] = 1 / self.jy * (self.r * 0.0 + x[4] * x[3] * (self.jy - self.jx))
+        #
+        # y[6] = (1 / self.jz *
+        #         (self.r * 0.0 + (self.jr + self.jp) *
+        #          x[3] * (-self.W1 + self.W2 - self.W3 + self.W4) +
+        #          x[3] * x[5] * (self.jx - self.jz)))
         return y
-
-    def get_ug(self):
-        ug = np.array([
-            [self.U * np.cos(self.lat)],
-            [self.U * np.sin(self.lat)],
-            [0.0]
-        ], dtype=float)
-        return ug
