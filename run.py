@@ -2,21 +2,25 @@ from model import Quadcopter
 import numpy as np
 from utils import rotate_matrix_b2g, roll_yaw_pitch, length
 
-
 x = np.array([
     0.0,  # r
     0.0,  # y
     0.0,  # p
     0.0,  # wr
     0.0,  # wy
-    0.0   # wp
+    0.0  # wp
 ], dtype=float)
 quadcopter = Quadcopter(state=x)
 
-evaluation, t_eval = quadcopter.compute(t_span=(0.0, 11.5),
-                                        t_eval=np.arange(0.0, 1.5, 0.12))
+solve = quadcopter.compute(t_span=(0.0, 10),
+                           t_eval=np.arange(0.0, 10, 1))
+# l = solve.y[:4, solve.y.shape[-1] - 1]
+# print(roll_yaw_pitch(l))
+for i in range(solve.y.shape[-1]):
+    q = roll_yaw_pitch(solve.y[:4, i])
+    print(q)
 
-print(evaluation, t_eval)
+#print(solve)
 # while rk.t < rk.t_bound:
 #     rk.step()
 #     # вектор углов поворота связанных осей относительно осей сопровождающего трехгранника

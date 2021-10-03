@@ -17,6 +17,6 @@ class Model:
                           y0=self.init_state,
                           t_span=t_span,
                           t_eval=t_eval)
-        return solve.y, solve.t
+        return solve
 
 
