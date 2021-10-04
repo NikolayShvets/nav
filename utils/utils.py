@@ -32,6 +32,7 @@ def roll_yaw_pitch(l: np.array) -> Tuple[float, float, float]:
     )
     r = (r + np.pi * 2) % (np.pi * 2)
     y = (y + np.pi * 2) % (np.pi * 2)
+    # p = (p + np.pi * 2) % (np.pi * 2)
     return r, y, p
 
 
