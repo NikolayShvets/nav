@@ -17,8 +17,8 @@ class Model:
                           y0=self.init_state,
                           t_span=t_span,
                           t_eval=t_eval,
-                          atol=1e-6,
-                          rtol=1e-6)
+                          atol=1e-12,
+                          rtol=1e-12)
         return solve
 
 

@@ -40,7 +40,6 @@ class Quadcopter(Model):
     W1 = W2 = W3 = W4 = 340
 
     def __init__(self, state: np.array):
-        super().__init__(state)
         r, y, p = state[:3]
         self.l = quaternion.from_euler_angles(r, y, p)
 
@@ -54,40 +53,33 @@ class Quadcopter(Model):
         l3 = (np.cos(r / 2) * np.cos(y / 2) * np.sin(p / 2) -
               np.sin(r / 2) * np.sin(y / 2) * np.cos(p / 2))
 
-        self.l = Quaternion(l0, l1, l2, l3)
-        self.t_prev = None
+        state = np.concatenate((np.array([l0, l1, l2 ,l3], dtype=float), state[3:]))
+        super().__init__(state)
+        # self.l = Quaternion(l0, l1, l2, l3)
+        # self.t_prev = None
 
     def increment(self, t: float, x: np.array) -> np.array:
-        # y = np.zeros(x.shape)
-        # wr, wy, wp = x[4:7]
-        # l = x[:4]
-
-        # y[0] = -0.5 * (wr * l[1] + wy * l[2] + wp * l[3])
-        # y[1] = +0.5 * (wr * l[0] + wy * l[3] - wp * l[2])
-        # y[2] = +0.5 * (wy * l[0] + wp * l[1] - wr * l[3])
-        # y[3] = +0.5 * (wp * l[0] + wr * l[2] - wy * l[1])
-
-        # y[0] = 0.5 * (wr * -l[1] + wy * -l[2] + wp * -l[3])
-        # y[1] = 0.5 * (wr * l[0] + wy * -l[3] + wp * l[2])
-        # y[2] = 0.5 * (wr * l[3] + wy * l[0] + wp * -l[1])
-        # y[3] = 0.5 * (wr * -l[2] + wy * l[1] + wp * l[0])
-
-        # def get_w(t):
-        #     return x[3:]
-
-        if self.t_prev is None:
-            self.t_prev = t
-
-        # self.l = quaternion.integrate_angular_velocity(Omega=get_w, t0=self.t_prev, t1=t, R0=self.l)[-1][-1]
-        self.l.integrate(x[3:], t-self.t_prev)
-        self.t_prev = t
-
+        # if self.t_prev is None:
+        #     self.t_prev = t
+        # self.l.integrate(x, t-self.t_prev)
+        # self.t_prev = t
+        #
+        # yaw, pitch, roll = self.l.yaw_pitch_roll
+        # roll = (roll + np.pi * 2) % (np.pi * 2)
+        # yaw = (yaw + np.pi * 2) % (np.pi * 2)
 
         y = np.zeros(x.shape)
 
-        y[3] = 0.0
+        l = Quaternion(x[0], x[1], x[2], x[3])
+        w = Quaternion(0, x[4], x[5], x[6])
+        dldt = 0.5 * l * w
+        y[0] = dldt[0]
+        y[1] = dldt[1]
+        y[2] = dldt[2]
+        y[3] = dldt[3]
         y[4] = 0.0
         y[5] = 0.0
+        y[6] = 0.0
         # y[4] = (1 / self.jx *
         #         (self.r * 0.0 + (self.jr + self.jp) *
         #          x[5] * (self.W1 - self.W2 + self.W3 - self.W4) +

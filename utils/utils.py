@@ -17,7 +17,6 @@ def rotate_matrix_b2g(r, y, p, inv: bool = False) -> np.array:
 
 
 def roll_yaw_pitch(l: np.array) -> Tuple[float, float, float]:
-    assert l.shape == (4, ), "Кватернион должен состоять из 4 элементов!"
     l_norm = l / sum([li ** 2 for li in l])
     r = np.arctan2(
         (2 * l_norm[0] * l_norm[1] - 2 * l_norm[2] * l_norm[3]),
