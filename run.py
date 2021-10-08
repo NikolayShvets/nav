@@ -7,12 +7,12 @@ from pyquaternion import Quaternion
 from utils import rotate_matrix_b2g, roll_yaw_pitch, length, get_ug
 
 x = np.array([
-    0.0,  # r
-    0.0,  # y
-    0.0,  # p
+    1.0,  # r
+    1.0,  # y
+    -1.0,  # p
     1.0,  # wr
-    0.0,  # wy
-    0.0  # wp
+    2.0,  # wy
+    1.0  # wp
 ], dtype=float)
 quadcopter = Quadcopter(state=x)
 
@@ -35,7 +35,7 @@ for i in range(solve.y.shape[-1] + 1):
     eps = np.random.normal(0.0, 1e-2, 3)
     eps.shape = 3, 1
     # измерение ДУС
-    measurement = wb + ub + eps
+    measurement = wb #+ ub + eps
     print(measurement)
 
     init_l = column[:4]

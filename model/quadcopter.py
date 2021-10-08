@@ -55,24 +55,13 @@ class Quadcopter(Model):
 
         state = np.concatenate((np.array([l0, l1, l2 ,l3], dtype=float), state[3:]))
         super().__init__(state)
-        # self.l = Quaternion(l0, l1, l2, l3)
-        # self.t_prev = None
 
     def increment(self, t: float, x: np.array) -> np.array:
-        # if self.t_prev is None:
-        #     self.t_prev = t
-        # self.l.integrate(x, t-self.t_prev)
-        # self.t_prev = t
-        #
-        # yaw, pitch, roll = self.l.yaw_pitch_roll
-        # roll = (roll + np.pi * 2) % (np.pi * 2)
-        # yaw = (yaw + np.pi * 2) % (np.pi * 2)
-
         y = np.zeros(x.shape)
 
         l = Quaternion(x[0], x[1], x[2], x[3])
         w = Quaternion(0, x[4], x[5], x[6])
-        dldt = 0.5 * l * w
+        dldt = 0.5 * w * l
         y[0] = dldt[0]
         y[1] = dldt[1]
         y[2] = dldt[2]

@@ -47,11 +47,11 @@ class KalmanFiltering:
 
     @property
     def filtered_state(self) -> List[np.array]:
-        return np.array(self.__filtered_state)
+        return self.__filtered_state
 
     @property
     def covariance_history(self) -> List[np.array]:
-        return np.array(self.__covariance_history)
+        return self.__covariance_history
 
     @property
     def z_history(self):
@@ -82,19 +82,8 @@ class KalmanFiltering:
         self.__filter.P = np.diag(self.__p_x)
         self.__filtered_state.append(self.__x)
 
-    def __compute_z(self, deltas: np.array):
-        return np.array([self.__filtered_state[-1][0] + deltas[0],
-                         self.__filtered_state[-1][1] + deltas[1],
-                         self.__filtered_state[-1][2] + deltas[2],
-                         deltas[0] / deltas[-1],
-                         deltas[1] / deltas[-1],
-                         deltas[2] / deltas[-1],
-                         self.__filtered_state[-1][6] + deltas[3],
-                         self.__filtered_state[-1][7] + deltas[4],
-                         self.__filtered_state[-1][8] + deltas[5],
-                         deltas[3] / deltas[-1],
-                         deltas[4] / deltas[-1],
-                         deltas[5] / deltas[-1]]), deltas[-1]
+    def __compute_z(self, deltas: np.array, time_step: float):
+        return deltas, time_step
 
     def __call__(self, deltas: np.array) -> Tuple[np.array, np.array]:
         """
