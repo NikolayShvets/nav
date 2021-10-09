@@ -3,6 +3,19 @@ from typing import Tuple
 import numpy as np
 
 
+def ryp2quaternion(r: float, y: float, p: float) -> np.array:
+    l0 = (np.cos(r / 2) * np.cos(y / 2) * np.cos(p / 2) -
+          np.sin(r / 2) * np.sin(y / 2) * np.sin(p / 2))
+    l1 = (np.sin(r / 2) * np.cos(y / 2) * np.cos(p / 2) +
+          np.cos(r / 2) * np.sin(y / 2) * np.sin(p / 2))
+    l2 = (np.cos(r / 2) * np.sin(y / 2) * np.cos(p / 2) +
+          np.sin(r / 2) * np.cos(y / 2) * np.sin(p / 2))
+    l3 = (np.cos(r / 2) * np.cos(y / 2) * np.sin(p / 2) -
+          np.sin(r / 2) * np.sin(y / 2) * np.cos(p / 2))
+
+    return np.array([l0, l1, l2, l3], dtype=float)
+
+
 def rotate_matrix_b2g(r, y, p, inv: bool = False) -> np.array:
     c = np.cos
     s = np.sin
