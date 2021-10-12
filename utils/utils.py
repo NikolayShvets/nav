@@ -42,8 +42,8 @@ def roll_yaw_pitch(l: np.array) -> Tuple[float, float, float]:
     p = np.arcsin(
         (2 * l_norm[1] * l_norm[2] + 2 * l_norm[0] * l_norm[3])
     )
-    r = (r + np.pi * 2) % (np.pi * 2)
-    y = (y + np.pi * 2) % (np.pi * 2)
+    # r = (r + np.pi * 2) % (np.pi * 2)
+    # y = (y + np.pi * 2) % (np.pi * 2)
     # p = (p + np.pi * 2) % (np.pi * 2)
     return r, y, p
 
